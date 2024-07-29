@@ -10,6 +10,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: white;
     padding: 20px;
+    max-width: 90%; /* Tambahkan batas maksimum untuk responsif */
 }
 h1 {
     color: black;
@@ -20,30 +21,110 @@ h1 {
 .subjudul{
     display: flex;
     justify-content: flex-start;
-    background-color: red;
+    background-color: #f3f3f3;
     padding: 25px;
     margin-top: 20px;
     align-items: center;
     border-radius: 0px 20px 20px 0px;
-    width: 800px;
-
+    width: 50%;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;/* Ubah lebar menjadi 100% untuk responsif */
 }
 
 .content{
     border-radius: 20px;
     padding: 30px;
-    background-color: #343a40;
-    width: 450px;
+    background-color: #f3f3f3;/* Ubah lebar menjadi 100% untuk responsif */
+    width:500px; /* Tambahkan batas maksimum */
     margin-top:120px;
-    margin-left: 100px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
 .bagi2{
     display: flex;
+    justify-content: space-around;
 }
 
-.kanan{
-    margin: 40px;
-    padding-top: 50px;
-    background-color: #343a40;
+.kanan {
+    margin-top: 30px;
+    padding-top: 30px;
+    background-color: #f3f3f3;
+    width: 100%; /* Ubah lebar menjadi 100% untuk responsif */
+    max-width: 1200px; /* Tambahkan batas maksimum */
+    height: 80vh;
+    border-radius: 20px;
+    overflow-y: scroll; /* Tetap bisa scroll */
+    scrollbar-width: none; /* Untuk Firefox */
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.kanan::-webkit-scrollbar {
+    display: none; /* Sembunyikan scrollbar untuk Chrome, Safari, dan Edge */
+}
+
+.defect-description{
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 5px;
+text-align: center;
+}
+
+h3{
+    margin-top: 5px;
+}
+
+.table td {
+    font-size: 24px; /* Atur ukuran font untuk elemen td */
+}
+
+.defect-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Menyelaraskan konten ke tengah */
+}
+.defect-item {
+    width: 250px; /* Atur lebar item gambar */
+    margin: 10px; /* Tambahkan margin untuk memberikan jarak antar item */
+    text-align: center;
+}
+.defect-image {
+width: 250px; /* Atur lebar gambar menjadi 300px */
+height: 250px; /* Atur tinggi gambar menjadi 300px */
+object-fit: cover; /* Memotong gambar agar sesuai ukuran */
+}
+h1 .judul{
+    padding-left: 20px;
+}
+/* Menyelaraskan teks ke tengah */
+
+/* Media query untuk tampilan kecil */
+@media (max-width: 768px) {
+
+    .subjudul{
+        width: 100%;
+    }
+    .bagi2 {
+        flex-direction: column; /* Ubah arah flex menjadi kolom */
+    }
+
+    h1 {
+        color: black;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .table td {
+        font-size: 18px; /* Atur ukuran font untuk elemen td */
+    }
+
+    .kiri, .kanan {
+        width: 100%; /* Ubah lebar menjadi 100% untuk responsif */
+        margin-left: 0; /* Hapus margin kiri */
+    }
+
+    .content {
+        margin-left: 0; /* Hapus margin kiri */
+        margin-top: 20px;
+        width: 100%;
+        max-width: 450px; /* Tambahkan margin atas untuk jarak */
+    }
 }
