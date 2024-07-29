@@ -4,7 +4,7 @@
 <div class="container">
     <h1>Defects List</h1>
     <a href="{{ route('defects.create') }}" class="btn btn-primary">Add Defect</a>
-    <a href="{{ route('dash') }}" class="btn btn-secondary mb-3">Lihat Dashboard</a> <!-- Tombol untuk melihat dashboard -->
+    <a href="{{ route('dash') }}" class="btn btn-secondary">Lihat Dashboard</a> <!-- Tombol untuk melihat dashboard -->
     @if(session('success'))
         <div class="alert alert-success mt-2">{{ session('success') }}</div>
     @endif
