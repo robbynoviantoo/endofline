@@ -3,12 +3,38 @@
 @section('content')
 <div class="container">
     <h1>Defects List</h1>
-    <a href="{{ route('defects.create') }}" class="btn btn-primary">Add Defect</a>
-    <a href="{{ route('dash') }}" class="btn btn-secondary">Lihat Dashboard</a> <!-- Tombol untuk melihat dashboard -->
+    <div class="mb-2">
+        <a href="{{ route('defects.create') }}" class="btn btn-primary">Add Defect</a>
+        <form action="{{ route('dash') }}" method="GET" class="mb-3">
+            <div class="form-group">
+                <label for="cell">Select Cell:</label>
+                <select name="cell" id="cell" class="form-control">
+                    <option value="">All Cells</option>
+                    @foreach($cells as $cell)
+                        <option value="{{ $cell }}" {{ request('cell') == $cell ? 'selected' : '' }}>{{ $cell }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary">Lihat Dashboard</button>
+        </form>
+        <form action="{{ route('filter.cell') }}" method="GET" class="d-inline">
+            @csrf
+            <div class="form-group d-inline">
+                <select name="cell" class="form-control form-control-sm d-inline" onchange="this.form.submit()">
+                    <option value="">Pilih Cell</option>
+                    @foreach($cells as $cell)
+                        <option value="{{ $cell }}" {{ request('cell') == $cell ? 'selected' : '' }}>
+                            {{ $cell }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </form>
+    </div>
     @if(session('success'))
         <div class="alert alert-success mt-2">{{ session('success') }}</div>
     @endif
-    <table class="table mt-2">
+    <table id="defectsTable" class="table table-striped mt-2">
         <thead>
             <tr>
                 <th>ID</th>
@@ -58,4 +84,11 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#defectsTable').DataTable();
+    });
+</script>
+
 @endsection

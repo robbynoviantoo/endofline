@@ -7,6 +7,17 @@
     <title>Dashboard Defect</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="public/css/style.css">
+    <style>
+        .passrate {
+            font-weight: bold;
+        }
+        .passrate.high {
+            color: green;
+        }
+        .passrate.low {
+            color: red;
+        }
+    </style>
     <script>
         // Auto refresh setiap 5 detik
         setTimeout(function(){
@@ -19,6 +30,10 @@
         @php
             $defect = $defects->last(); // Mengambil inputan terakhir
             $images = json_decode($defect->images);
+            $qtyok = $defect->qtyok;
+            $qtynok = $defect->qtynok;
+            $passrate = ($qtyok + $qtynok) > 0 ? $qtyok / ($qtyok + $qtynok) * 100 : 0; // Menghitung passrate dalam persen
+            $passrateClass = $passrate <= 90 ? 'low' : 'high'; // Menentukan kelas berdasarkan nilai passrate
         @endphp
         <div class="judul">
             <div class="subjudul">
@@ -44,12 +59,18 @@
                     <h1>QTY CHECK</h1>
                     <table class="table">
                         <tr>
-                            <td>OK</td>
-                            <td>: {{ $defect->qtyok }}</td> <!-- Menjaga sejajar -->
+                            <td style="color: green">OK</td>
+                            <td>: {{ $qtyok }}</td> <!-- Menjaga sejajar -->
                         </tr>
                         <tr>
-                            <td>Not OK</td>
-                            <td>: {{ $defect->qtynok }}</td> <!-- Menjaga sejajar -->
+                            <td style="color: red">Not OK</td>
+                            <td>: {{ $qtynok }}</td> <!-- Menjaga sejajar -->
+                        </tr>
+                        <tr>
+                            <td class="passrate {{ $passrateClass}}">Passrate</td>
+                            <td class="passrate {{ $passrateClass }}">
+                                : {{ number_format($passrate, 2) }}%
+                            </td> <!-- Menampilkan passrate dalam persen dengan 2 desimal -->
                         </tr>
                     </table>
                 </div>

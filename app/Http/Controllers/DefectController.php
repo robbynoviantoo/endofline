@@ -9,10 +9,20 @@ use Illuminate\Support\Facades\Storage;
 class DefectController extends Controller
 {
     // Menampilkan daftar defect
-    public function index()
+    public function index(Request $request)
     {
-        $defects = Defect::all();
-        return view('defects.index', compact('defects'));
+        $query = Defect::query();
+        
+        // Ambil daftar cell yang unik
+        $cells = Defect::distinct()->pluck('cell');
+        
+        if ($request->has('cell') && $request->cell != '') {
+            $query->where('cell', $request->cell);
+        }
+        
+        $defects = $query->get();
+        
+        return view('defects.index', compact('defects', 'cells'));
     }
 
     // Menampilkan formulir untuk menambahkan defect baru
@@ -30,8 +40,8 @@ class DefectController extends Controller
             'cell' => 'required|string',
             'qtyok' => 'required|integer',
             'qtynok' => 'required|integer',
-            'defect' => 'required|array',
-            'defect.*' => 'required|string',
+            'defect' => 'nullable|array',
+            'defect.*' => 'nullable|string',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -81,8 +91,8 @@ class DefectController extends Controller
             'cell' => 'required|string',
             'qtyok' => 'required|integer',
             'qtynok' => 'required|integer',
-            'defect' => 'required|array',
-            'defect.*' => 'required|string',
+            'defect' => 'nullable|array',
+            'defect.*' => 'nullable|string',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'string',
@@ -161,9 +171,18 @@ class DefectController extends Controller
         return redirect()->route('defects.index')->with('success', 'Defect deleted successfully!');
     }
 
-    public function dashboard()
-{
-    $defects = Defect::all(); // Ambil semua data defect
-    return view('dash', compact('defects'));
-}
+    public function dashboard(Request $request)
+    {
+        $cell = $request->query('cell'); // Ambil parameter cell dari query string
+        $defectsQuery = Defect::query();
+    
+        if ($cell) {
+            $defectsQuery->where('cell', $cell);
+        }
+    
+        $defects = $defectsQuery->get(); // Ambil data defect berdasarkan filter
+        $cells = Defect::distinct()->pluck('cell'); // Ambil daftar cell yang tersedia
+    
+        return view('dash', compact('defects', 'cells'));
+    }
 }

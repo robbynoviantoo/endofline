@@ -12,7 +12,8 @@ Auth::routes();
 
 Route::resource('defects', DefectController::class);
 
-// web.php
 Route::delete('/defects/{defect}/remove-image/{image}', [DefectController::class, 'removeImage'])->name('defects.removeImage');
 
-Route::get('/dash', [DefectController::class, 'dashboard'])->name('dash');
+Route::get('/dashboard', [DefectController::class, 'dashboard'])->name('dash');
+Route::get('/defects', [DefectController::class, 'index'])->name('defects.index');
+Route::get('/filter-cell', [DefectController::class, 'index'])->name('filter.cell');

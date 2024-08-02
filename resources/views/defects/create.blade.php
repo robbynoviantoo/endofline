@@ -8,18 +8,18 @@
         @csrf
         <div class="form-group">
             <label for="tanggal">Tanggal:</label>
-            <input type="date" id="tanggal" name="tanggal" class="form-control" required value="{{ old('tanggal') }}">
+            <input type="date" id="tanggal" name="tanggal" class="form-control" required value="{{ old('tanggal', date('Y-m-d')) }}">
         </div>
         <div class="form-group">
             <label for="cell">Cell:</label>
             <input type="text" id="cell" name="cell" class="form-control" required value="{{ old('cell') }}">
         </div>
         <div class="form-group">
-            <label for="qtyok">QTY OK:</label>
+            <label for="qtyok">Qty OK:</label>
             <input type="number" id="qtyok" name="qtyok" class="form-control" required value="{{ old('qtyok') }}">
         </div>
         <div class="form-group">
-            <label for="qtynok">QTY Not OK:</label>
+            <label for="qtynok">Qty Not OK:</label>
             <input type="number" id="qtynok" name="qtynok" class="form-control" required value="{{ old('qtynok') }}">
         </div>
         <div class="row">
@@ -36,18 +36,30 @@
                 </div>
             </div>
         </div>
-        <button type="button" onclick="addDefectInput()">Tambah Defect</button>
+        <button type="button" class="btn btn-primary" style="margin-top: 10px;" onclick="addDefectInput()">Tambah Defect</button>
         <script>
             function addDefectInput() {
+                var defectsLeft = document.getElementById('defects-left');
+                var defectsRight = document.getElementById('defects-right');
+
+                // Cek apakah salah satu kolom defect sudah terisi
+                var leftInput = defectsLeft.querySelector('input[type="text"]');
+                var rightInput = defectsRight.querySelector('input[type="text"]');
+
+                if (leftInput.value.trim() === '' && rightInput.value.trim() === '') {
+                    alert('Silakan isi salah satu kolom defect sebelum menambah input baru.');
+                    return;
+                }
+
                 var newDefectInputLeft = document.createElement('div');
                 newDefectInputLeft.style.marginTop = "10px"; // Menambahkan sedikit margin
-                newDefectInputLeft.innerHTML = '<input type="text" name="defect[]" class="form-control" required>';
-                document.getElementById('defects-left').appendChild(newDefectInputLeft);
+                newDefectInputLeft.innerHTML = '<input type="text" name="defect[]" class="form-control">';
+                defectsLeft.appendChild(newDefectInputLeft);
 
                 var newDefectInputRight = document.createElement('div');
                 newDefectInputRight.style.marginTop = "10px"; // Menambahkan sedikit margin
-                newDefectInputRight.innerHTML = '<input type="text" name="defect[]" class="form-control" required>';
-                document.getElementById('defects-right').appendChild(newDefectInputRight);
+                newDefectInputRight.innerHTML = '<input type="text" name="defect[]" class="form-control">';
+                defectsRight.appendChild(newDefectInputRight);
             }
         </script>
         
@@ -57,7 +69,7 @@
             <input type="file" id="images" name="images[]" class="form-control" multiple>
         </div>
 
-        <button type="submit" class="btn btn-primary">Simpan</button>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Simpan</button>
     </form>
 </div>
 
