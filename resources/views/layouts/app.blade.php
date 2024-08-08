@@ -16,12 +16,17 @@
 
     <!-- Scripts -->
     {{-- @vite(['resources/sass/app.scss', 'resources/js/app.js']) --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-    <script src="https://cdn.datatables.net/2.1.2/css/dataTables.dataTables.min.css"></script>
-    <script src="https://cdn.datatables.net/2.1.2/js/dataTables.min.js"></script>
+    <link href="{{ asset('resources/css/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('resources/js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('resources/js/sweetalert2/sweetalert2.js') }}"></script>
+    <script src="{{ asset('resources/js/jquery/jquery-3.7.1.min.js') }}"></script>
+    <script src="{{ asset('resources/js/datatables/datatables.min.js') }}"></script>
+    <link href="{{ asset('resources/css/datatables/datatables.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('resources/css/fontawesome/all.min.css') }}">
+    <script src="{{ asset('resources/js/chart/chart.js') }}"></script>
+    <script src="{{ asset('resources/js/chart/chartjs-plugin-datalabels.js') }}"></script>
+    <script src="{{ asset('resources/js/delete.js') }}"></script>
+    <script src="{{ asset('resources/js/show.js') }}"></script>
     <style>
         .row {
             display: flex;
@@ -94,5 +99,10 @@
             @yield('content')
         </main>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('#defectsTable').DataTable();
+        });
+    </script>
 </body>
 </html>

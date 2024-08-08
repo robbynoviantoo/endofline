@@ -42,7 +42,7 @@ class DefectController extends Controller
             'qtynok' => 'required|integer',
             'defect' => 'nullable|array',
             'defect.*' => 'nullable|string',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20000',
         ]);
 
         // Menyimpan gambar jika ada
@@ -93,7 +93,7 @@ class DefectController extends Controller
             'qtynok' => 'required|integer',
             'defect' => 'nullable|array',
             'defect.*' => 'nullable|string',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20000',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'string',
         ]);
