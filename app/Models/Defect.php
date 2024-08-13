@@ -16,6 +16,7 @@ class Defect extends Model
     protected $fillable = [
         'tanggal',
         'cell',
+        'idpass',
         'qtyok',
         'qtynok',
         'defect',
