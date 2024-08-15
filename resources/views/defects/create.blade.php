@@ -26,29 +26,42 @@
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
-        <div class="form-group">
-            <label for="qtyok">Qty OK:</label>
-            <input type="number" id="qtyok" name="qtyok" class="form-control" required value="{{ old('qtyok') }}">
-        </div>
-        <div class="form-group">
-            <label for="qtynok">Qty Not OK:</label>
-            <input type="number" id="qtynok" name="qtynok" class="form-control" required value="{{ old('qtynok') }}">
-        </div>
-        <div class="row" id="defect-container">
-            <div class="col-xl-6 defect-column" id="defects-left">
+
+        <!-- ID Pass, Qty OK, Qty Not OK -->
+        <div id="idpass-entries" class="row">
+            <div class="col-md-4">
                 <div class="form-group">
-                    <label for="defect">Defect:</label>
-                    <input type="text" name="defect[]" class="form-control" value="{{ old('defect.0') }}">
+                    <label for="idpass">ID Pass:</label>
+                    <input type="text" name="idpass[]" class="form-control" placeholder="ID Pass" value="{{ old('idpass.0') }}" required>
                 </div>
             </div>
-            <div class="col-xl-6 defect-column" id="defects-right">
+            <div class="col-md-4">
                 <div class="form-group">
-                    <label for="defect"></label>
-                    <input type="text" name="defect[]" class="form-control" value="{{ old('defect.1') }}">
+                    <label for="qtyok">Qty OK:</label>
+                    <input type="number" name="qtyok[]" class="form-control" placeholder="Qty OK" value="{{ old('qtyok.0') }}" required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="qtynok">Qty Not OK:</label>
+                    <input type="number" name="qtynok[]" class="form-control" placeholder="Qty Not OK" value="{{ old('qtynok.0') }}" required>
                 </div>
             </div>
         </div>
-        <button type="button" class="btn btn-primary" style="margin-top: 10px;" onclick="addDefectInput()">Tambah Defect</button>
+        <button type="button" class="btn btn-primary" style="margin-bottom: 10px" onclick="addIdPassEntry()">Tambah ID Pass Entry</button>
+
+        <!-- Defect -->
+        <div id="defect-entries">
+            @for ($i = 0; $i < 3; $i++)
+                <div class="defect-entry">
+                    <div class="form-group">
+                        <label for="defect">Defect:</label>
+                        <input type="text" name="defect[]" class="form-control" placeholder="Defect" value="{{ old('defect.' . $i) }}">
+                    </div>
+                </div>
+            @endfor
+        </div>
+        <button type="button" class="btn btn-primary" style="margin-top: 10px;" onclick="addDefectEntry()">Tambah Defect</button>
 
         <!-- Input gambar -->
         <div class="form-group">
@@ -61,47 +74,84 @@
 </div>
 
 <script>
-    function addDefectInput() {
-        var defectsLeft = document.getElementById('defects-left');
-        var defectsRight = document.getElementById('defects-right');
-        var defectContainer = document.getElementById('defect-container');
+function addIdPassEntry() {
+    var container = document.getElementById('idpass-entries');
 
-        // Cek apakah salah satu kolom defect sudah terisi
-        var leftInput = defectsLeft.querySelector('input[type="text"]');
-        var rightInput = defectsRight.querySelector('input[type="text"]');
+    // Buat div untuk ID Pass
+    var idPassDiv = document.createElement('div');
+    idPassDiv.className = 'col-md-4';
+    idPassDiv.innerHTML = `
+        <div class="form-group mb-0">
+            <label for="idpass">ID Pass:</label>
+            <input type="text" name="idpass[]" class="form-control" placeholder="ID Pass" required>
+        </div>
+    `;
+    
+    // Buat div untuk Qty OK
+    var qtyOkDiv = document.createElement('div');
+    qtyOkDiv.className = 'col-md-4';
+    qtyOkDiv.innerHTML = `
+        <div class="form-group mb-0">
+            <label for="qtyok">Qty OK:</label>
+            <input type="number" name="qtyok[]" class="form-control" placeholder="Qty OK" required>
+        </div>
+    `;
+    
+    // Buat div untuk Qty Not OK
+    var qtyNokDiv = document.createElement('div');
+    qtyNokDiv.className = 'col-md-4';
+    qtyNokDiv.innerHTML = `
+        <div class="form-group mb-0">
+            <label for="qtynok">Qty Not OK:</label>
+            <input type="number" name="qtynok[]" class="form-control" placeholder="Qty Not OK" required>
+        </div>
+    `;
 
-        if (leftInput.value.trim() === '' && rightInput.value.trim() === '') {
-            alert('Silakan isi salah satu kolom defect sebelum menambah input baru.');
-            return;
-        }
+    // Tambahkan kolom ke dalam container
+    container.appendChild(idPassDiv);
+    container.appendChild(qtyOkDiv);
+    container.appendChild(qtyNokDiv);
 
-        // Tambahkan input defect baru
-        var newDefectInputLeft = document.createElement('div');
-        newDefectInputLeft.className = 'form-group new-defect-input';
-        newDefectInputLeft.innerHTML = '<input type="text" name="defect[]" class="form-control" placeholder="Defect">';
-
-        var newDefectInputRight = document.createElement('div');
-        newDefectInputRight.className = 'form-group new-defect-input';
-        newDefectInputRight.innerHTML = '<input type="text" name="defect[]" class="form-control" placeholder="Defect">';
-
-        // Tambahkan ke container
-        defectContainer.appendChild(newDefectInputLeft);
-        defectContainer.appendChild(newDefectInputRight);
+    // Tambahkan baris baru jika container tidak kosong
+    if (container.children.length % 3 === 0) {
+        var rowBreak = document.createElement('div');
+        rowBreak.className = 'w-100'; // Force break to new line in flexbox
+        container.appendChild(rowBreak);
     }
+}
+
+function addDefectEntry() {
+    var container = document.getElementById('defect-entries');
+
+    var newDefectEntry = document.createElement('div');
+    newDefectEntry.className = 'defect-entry';
+    newDefectEntry.innerHTML = `
+        <div class="form-group">
+            <label for="defect">Defect:</label>
+            <input type="text" name="defect[]" class="form-control" placeholder="Defect">
+        </div>
+    `;
+    container.appendChild(newDefectEntry);
+}
 </script>
 
 <style>
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .col-md-4 {
+        margin-bottom: 1rem;
+    }
+
     @media (max-width: 768px) {
-        #defect-container {
+        .row {
             display: block;
-        }
-
-        .defect-column {
-            width: 100% !important;
-        }
-
-        .new-defect-input {
-            margin-top: 20px;
         }
     }
 </style>

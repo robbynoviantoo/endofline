@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->date('tanggal');
             $table->string('cell');
-            $table->number('idpass');
-            $table->integer('qtyok')->default(0); // Menambahkan kolom qtyok dengan nilai default
-            $table->integer('qtynok')->default(0);
+            $table->json('idpass')->nullable();
+            $table->json('qtyok')->nullable();
+            $table->json('qtynok')->nullable();
             $table->text('defect')->nullable(); // Ubah menjadi array
             $table->timestamps();
         });

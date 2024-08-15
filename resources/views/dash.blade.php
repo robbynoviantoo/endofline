@@ -20,6 +20,22 @@
         .passrate.low {
             color: red;
         }
+
+        .defect-item {
+            margin-bottom: 1rem;
+        }
+
+        .defect-image {
+            max-width: 300px;
+            max-height: 300px;
+            margin-right: 40px;
+        }
+
+        .defect-description {
+            display: inline-block;
+            vertical-align: top;
+            margin-top: 5px;
+        }
     </style>
     <script>
         // Auto refresh setiap 5 detik
@@ -33,11 +49,32 @@
     @if ($defects->isNotEmpty())
         @php
             $defect = $defects->last(); // Mengambil inputan terakhir
-            $images = json_decode($defect->images);
-            $qtyok = $defect->qtyok;
-            $qtynok = $defect->qtynok;
-            $passrate = $qtyok + $qtynok > 0 ? ($qtyok / ($qtyok + $qtynok)) * 100 : 0; // Menghitung passrate dalam persen
+            
+            // Decode JSON images jika ada
+            $images = json_decode($defect->images, true);
+            
+            // Memastikan $images adalah array
+            if (!is_array($images)) {
+                $images = [];
+            }
+
+            // Decode JSON qtyok dan qtynok jika perlu
+            $qtyokArray = is_string($defect->qtyok) ? json_decode($defect->qtyok, true) : $defect->qtyok;
+            $qtynokArray = is_string($defect->qtynok) ? json_decode($defect->qtynok, true) : $defect->qtynok;
+
+            $qtyokTotal = is_array($qtyokArray) ? array_sum($qtyokArray) : (is_numeric($defect->qtyok) ? (int)$defect->qtyok : 0);
+            $qtynokTotal = is_array($qtynokArray) ? array_sum($qtynokArray) : (is_numeric($defect->qtynok) ? (int)$defect->qtynok : 0);
+
+            $passrate = $qtyokTotal + $qtynokTotal > 0 ? ($qtyokTotal / ($qtyokTotal + $qtynokTotal)) * 100 : 0; // Menghitung passrate dalam persen
             $passrateClass = $passrate <= 90 ? 'low' : 'high'; // Menentukan kelas berdasarkan nilai passrate
+            
+            // Decode defect descriptions jika ada
+            $defectDescriptions = is_string($defect->defect) ? json_decode($defect->defect, true) : $defect->defect;
+            
+            // Memastikan $defectDescriptions adalah array
+            if (!is_array($defectDescriptions)) {
+                $defectDescriptions = [];
+            }
         @endphp
         <div class="judul">
             <div class="subjudul">
@@ -64,11 +101,11 @@
                     <table class="table">
                         <tr>
                             <td style="color: green">OK</td>
-                            <td>: {{ $qtyok }}</td> <!-- Menjaga sejajar -->
+                            <td>: {{ $qtyokTotal }}</td> <!-- Menjaga sejajar -->
                         </tr>
                         <tr>
                             <td style="color: red">Not OK</td>
-                            <td>: {{ $qtynok }}</td> <!-- Menjaga sejajar -->
+                            <td>: {{ $qtynokTotal }}</td> <!-- Menjaga sejajar -->
                         </tr>
                         <tr>
                             <td class="passrate {{ $passrateClass }}">Passrate</td>
@@ -81,14 +118,14 @@
             </div>
             <div class="kanan">
                 <h1 class="judul" style="margin-left: 70px;">Detail Defect</h1>
-                @if ($defect->images)
+                @if (!empty($images))
                     <div class="defect-container">
                         @foreach ($images as $index => $image)
                             <div class="defect-item">
                                 <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image"
                                     class="defect-image">
                                 <div class="defect-description">
-                                    {{ explode(';', $defect->defect)[$index] ?? 'Keterangan tidak tersedia' }}
+                                    {{ $defectDescriptions[$index] ?? 'Keterangan tidak tersedia' }}
                                 </div>
                             </div>
                         @endforeach

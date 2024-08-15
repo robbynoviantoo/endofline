@@ -16,11 +16,18 @@ class DefectController extends Controller
         // Ambil daftar cell yang unik
         $cells = Defect::distinct()->pluck('cell');
         
+        // Filter berdasarkan cell jika ada
         if ($request->has('cell') && $request->cell != '') {
             $query->where('cell', $request->cell);
         }
-        
-        $defects = $query->get();
+
+        // Urutkan berdasarkan tanggal descending
+        $defects = $query->orderBy('tanggal', 'desc')->get();
+
+        // Hitung total qtyok jika diperlukan
+        foreach ($defects as $defect) {
+            $defect->total_qtyok = array_sum(is_array($defect->qtyok) ? $defect->qtyok : json_decode($defect->qtyok, true));
+        }
         
         return view('defects.index', compact('defects', 'cells'));
     }
@@ -38,13 +45,13 @@ class DefectController extends Controller
         $validated = $request->validate([
             'tanggal' => 'required|date',
             'cell' => 'required|string',
-            'qtyok' => 'required|integer',
-            'qtynok' => 'required|integer',
-            'defect' => 'nullable|array',
+            'idpass.*' => 'nullable|string',
+            'qtyok.*' => 'nullable|integer',
+            'qtynok.*' => 'nullable|integer',
             'defect.*' => 'nullable|string',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20000',
         ]);
-
+    
         // Menyimpan gambar jika ada
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -53,115 +60,143 @@ class DefectController extends Controller
                 $imagePaths[] = $path;
             }
         }
-
-        // Menambahkan gambar ke data yang akan disimpan
-        $validated['images'] = json_encode($imagePaths); // Konversi array ke JSON string
-
-        // Pastikan untuk tidak menyimpan array, tetapi string JSON
+    
+        // Menyimpan data defect baru
         Defect::create([
             'tanggal' => $validated['tanggal'],
             'cell' => $validated['cell'],
-            'qtyok' => $validated['qtyok'],
-            'qtynok' => $validated['qtynok'],
-            'defect' => implode(';', $validated['defect']), // Mengubah array defect menjadi string
-            'images' => $validated['images'], // Menyimpan string JSON gambar
+            'idpass' => json_encode($validated['idpass']), // Store as JSON
+            'qtyok' => json_encode($validated['qtyok']),   // Store as JSON
+            'qtynok' => json_encode($validated['qtynok']), // Store as JSON
+            'defect' => isset($validated['defect']) ? json_encode($validated['defect']) : null,
+            'images' => json_encode($imagePaths),
         ]);
-
+    
         return redirect()->route('defects.index')->with('success', 'Defect added successfully!');
     }
 
     // Menampilkan detail defect
-    public function show(Defect $defect)
+    public function show($id)
     {
-        return view('defects.show', compact('defect'));
+        $defect = Defect::findOrFail($id);
+    
+        // Decode JSON fields if necessary
+        $defect->images = json_decode($defect->images, true);
+        $defect->qtyok = is_string($defect->qtyok) ? json_decode($defect->qtyok, true) : $defect->qtyok;
+        $defect->qtynok = is_string($defect->qtynok) ? json_decode($defect->qtynok, true) : $defect->qtynok;
+        $defect->defect = is_string($defect->defect) ? json_decode($defect->defect, true) : $defect->defect;
+    
+        // Calculate totals
+        $qtyokTotal = is_array($defect->qtyok) ? array_sum($defect->qtyok) : (is_numeric($defect->qtyok) ? (int)$defect->qtyok : 0);
+        $qtynokTotal = is_array($defect->qtynok) ? array_sum($defect->qtynok) : (is_numeric($defect->qtynok) ? (int)$defect->qtynok : 0);
+    
+        // Calculate passrate
+        $passrate = $qtyokTotal + $qtynokTotal > 0 ? ($qtyokTotal / ($qtyokTotal + $qtynokTotal)) * 100 : 0;
+        $passrateClass = $passrate <= 90 ? 'low' : 'high';
+    
+        // Pass data to the view
+        return view('defects.show', compact('defect', 'qtyokTotal', 'qtynokTotal', 'passrate', 'passrateClass'));
     }
 
     // Menampilkan formulir untuk mengedit defect
     public function edit(Defect $defect)
     {
-        return view('defects.edit', compact('defect'));
+        // Pastikan $defect->idpass adalah string JSON sebelum decode
+        $idpassArray = is_string($defect->idpass) ? json_decode($defect->idpass, true) : $defect->idpass;
+    
+        // Pastikan $defect->qtyok adalah string JSON sebelum decode
+        $qtyokArray = is_string($defect->qtyok) ? json_decode($defect->qtyok, true) : $defect->qtyok;
+    
+        // Pastikan $defect->qtynok adalah string JSON sebelum decode
+        $qtynokArray = is_string($defect->qtynok) ? json_decode($defect->qtynok, true) : $defect->qtynok;
+    
+        // Pastikan $defect->images adalah string JSON sebelum decode
+        $images = is_string($defect->images) ? json_decode($defect->images, true) : [];
+    
+        return view('defects.edit', compact('defect', 'idpassArray', 'qtyokArray', 'qtynokArray', 'images'));
     }
+    
 
-    // Memperbarui defect di database
-    public function update(Request $request, Defect $defect)
-    {
-        // Validasi input
-        $validated = $request->validate([
-            'tanggal' => 'required|date',
-            'cell' => 'required|string',
-            'qtyok' => 'required|integer',
-            'qtynok' => 'required|integer',
-            'defect' => 'nullable|array',
-            'defect.*' => 'nullable|string',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20000',
-            'remove_images' => 'nullable|array',
-            'remove_images.*' => 'string',
-        ]);
+public function update(Request $request, Defect $defect)
+{
+    // Validasi input
+    $validated = $request->validate([
+        'tanggal' => 'required|date',
+        'cell' => 'required|string',
+        'idpass' => 'nullable|array',
+        'qtyok' => 'nullable|array',
+        'qtynok' => 'nullable|array',
+        'defect' => 'nullable|array',
+        'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20000',
+        'remove_images' => 'nullable|array',
+        'remove_images.*' => 'string',
+    ]);
 
-        // Memperbarui data di database
-        $defect->update([
-            'tanggal' => $validated['tanggal'],
-            'cell' => $validated['cell'],
-            'qtyok' => $validated['qtyok'],
-            'qtynok' => $validated['qtynok'],
-            'defect' => implode(';', $validated['defect']),
-        ]);
+    // Memperbarui data di database
+    $defect->update([
+        'tanggal' => $validated['tanggal'],
+        'cell' => $validated['cell'],
+        'idpass' => json_encode($validated['idpass']), // Simpan sebagai JSON
+        'qtyok' => json_encode($validated['qtyok']),   // Simpan sebagai JSON
+        'qtynok' => json_encode($validated['qtynok']), // Simpan sebagai JSON
+        'defect' => isset($validated['defect']) ? json_encode($validated['defect']) : null,
+    ]);
 
-        // Menghapus gambar yang dipilih
-        if ($request->has('remove_images')) {
-            $imagesToRemove = $request->input('remove_images');
-            $existingImages = json_decode($defect->images, true);
+    // Menghapus gambar yang dipilih
+    if ($request->has('remove_images')) {
+        $imagesToRemove = $request->input('remove_images');
+        $existingImages = is_string($defect->images) ? json_decode($defect->images, true) : [];
 
-            foreach ($imagesToRemove as $imageToRemove) {
-                $imageToRemovePath = 'images/' . $imageToRemove;
-                if (($key = array_search($imageToRemovePath, $existingImages)) !== false) {
-                    unset($existingImages[$key]);
-                    // Hapus gambar dari penyimpanan publik
-                    Storage::disk('public')->delete($imageToRemovePath);
-                }
+        foreach ($imagesToRemove as $imageToRemove) {
+            $imageToRemovePath = 'images/' . $imageToRemove;
+            if (($key = array_search($imageToRemovePath, $existingImages)) !== false) {
+                unset($existingImages[$key]);
+                // Hapus gambar dari penyimpanan publik
+                Storage::disk('public')->delete($imageToRemovePath);
             }
-
-            // Update daftar gambar di database
-            $defect->images = json_encode(array_values($existingImages));
-            $defect->save();
         }
 
-        // Menyimpan gambar baru jika ada
-        if ($request->hasFile('images')) {
-            $imagePaths = json_decode($defect->images, true) ?? [];
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('images', 'public');
-                $imagePaths[] = $path;
-            }
-            $defect->images = json_encode($imagePaths);
-            $defect->save();
-        }
-
-        return redirect()->route('defects.index')->with('success', 'Defect updated successfully!');
+        // Update daftar gambar di database
+        $defect->images = json_encode(array_values($existingImages));
+        $defect->save();
     }
+
+    // Menyimpan gambar baru jika ada
+    if ($request->hasFile('images')) {
+        $imagePaths = is_string($defect->images) ? json_decode($defect->images, true) : [];
+        foreach ($request->file('images') as $image) {
+            $path = $image->store('images', 'public');
+            $imagePaths[] = $path;
+        }
+        $defect->images = json_encode($imagePaths);
+        $defect->save();
+    }
+
+    return redirect()->route('defects.index')->with('success', 'Defect updated successfully!');
+}
+
+    
 
     // Menghapus gambar dari defect
     public function removeImage(Request $request, $defectId, $image)
-{
-    $defect = Defect::findOrFail($defectId);
-    $imageToRemove = 'images/' . $image;
-    $images = json_decode($defect->images, true);
+    {
+        $defect = Defect::findOrFail($defectId);
+        $imageToRemove = 'images/' . $image;
+        $images = json_decode($defect->images, true);
 
-    if (($key = array_search($imageToRemove, $images)) !== false) {
-        unset($images[$key]);
+        if (($key = array_search($imageToRemove, $images)) !== false) {
+            unset($images[$key]);
 
-        if (Storage::disk('public')->exists($imageToRemove)) {
-            Storage::disk('public')->delete($imageToRemove);
+            if (Storage::disk('public')->exists($imageToRemove)) {
+                Storage::disk('public')->delete($imageToRemove);
+            }
         }
+
+        $defect->images = json_encode(array_values($images));
+        $defect->save();
+
+        return response()->json(['success' => true]); // Kembalikan respons JSON
     }
-
-    $defect->images = json_encode(array_values($images));
-    $defect->save();
-
-    return response()->json(['success' => true]); // Kembalikan respons JSON
-}
-
-
 
     // Menghapus defect dari database
     public function destroy(Defect $defect)
@@ -171,18 +206,50 @@ class DefectController extends Controller
         return redirect()->route('defects.index')->with('success', 'Defect deleted successfully!');
     }
 
+    // Menampilkan dashboard
     public function dashboard(Request $request)
     {
         $cell = $request->query('cell'); // Ambil parameter cell dari query string
         $defectsQuery = Defect::query();
-    
+        
         if ($cell) {
             $defectsQuery->where('cell', $cell);
         }
     
-        $defects = $defectsQuery->get(); // Ambil data defect berdasarkan filter
+        // Ambil data defect berdasarkan filter
+        $defects = $defectsQuery->get(); 
         $cells = Defect::distinct()->pluck('cell'); // Ambil daftar cell yang tersedia
     
-        return view('dash', compact('defects', 'cells'));
+        // Inisialisasi variabel total
+        $qtyokTotal = 0;
+        $qtynokTotal = 0;
+    
+        // Loop untuk menghitung total qtyok dan qtynok
+        foreach ($defects as $defect) {
+            // Cek jika qtyok dan qtynok dalam format JSON atau string yang perlu didecode
+            $qtyokArray = is_string($defect->qtyok) ? json_decode($defect->qtyok, true) : $defect->qtyok;
+            $qtynokArray = is_string($defect->qtynok) ? json_decode($defect->qtynok, true) : $defect->qtynok;
+    
+            // Cek jika hasil json_decode menghasilkan array
+            if (is_array($qtyokArray)) {
+                $qtyokTotal += array_sum($qtyokArray);
+            } else {
+                $qtyokTotal += is_numeric($defect->qtyok) ? (int)$defect->qtyok : 0;
+            }
+    
+            if (is_array($qtynokArray)) {
+                $qtynokTotal += array_sum($qtynokArray);
+            } else {
+                $qtynokTotal += is_numeric($defect->qtynok) ? (int)$defect->qtynok : 0;
+            }
+        }
+    
+        // Hitung total dan passrate
+        $total = $qtyokTotal + $qtynokTotal;
+        $passrateTotal = $total > 0 ? ($qtyokTotal / $total) * 100 : 0;
+        $passrateClass = $passrateTotal <= 90 ? 'low' : 'high';
+    
+        return view('dash', compact('defects', 'cells', 'qtyokTotal', 'qtynokTotal', 'passrateTotal', 'passrateClass'));
     }
+    
 }

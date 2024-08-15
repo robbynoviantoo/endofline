@@ -12,14 +12,14 @@
                         <option value="">All Cells</option>
                         @foreach ($cells as $cell)
                             <option value="{{ $cell }}" {{ request('cell') == $cell ? 'selected' : '' }}>
-                                {{ $cell }}</option>
+                                {{ $cell }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
                 <button type="submit" class="btn btn-secondary mt-4">Lihat Dashboard</button>
             </form>
             <form action="{{ route('filter.cell') }}" method="GET" class="d-inline">
-                @csrf
                 <div class="form-group d-inline">
                     <select name="cell" class="form-control form-control-sm d-inline" onchange="this.form.submit()">
                         <option value="">Pilih Cell</option>
@@ -39,7 +39,6 @@
             <table id="defectsTable" class="table table-striped mt-2">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Tanggal</th>
                         <th>Cell</th>
                         <th>Defect</th>
@@ -50,25 +49,29 @@
                 <tbody>
                     @foreach ($defects as $defect)
                         <tr>
-                            <td>{{ $defect->id }}</td>
                             <td>{{ $defect->tanggal }}</td>
                             <td>{{ $defect->cell }}</td>
                             <td>
                                 <ul>
-                                    @foreach (explode(';', $defect->defect) as $defectItem)
+                                    @foreach (json_decode($defect->defect) as $defectItem)
                                         <li>{{ $defectItem }}</li>
                                     @endforeach
                                 </ul>
+                                
                             </td>
                             <td>
-                                @if ($defect->images)
+                                @if (!empty($defect->images))
                                     @php
-                                        $images = json_decode($defect->images);
+                                        $images = is_string($defect->images) ? json_decode($defect->images, true) : $defect->images;
                                     @endphp
-                                    @foreach ($images as $image)
-                                        <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image"
-                                            style="max-width: 100px; max-height: 100px; margin-right: 10px;">
-                                    @endforeach
+                                    @if (is_array($images))
+                                        @foreach ($images as $image)
+                                            <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image"
+                                                style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+                                        @endforeach
+                                    @else
+                                        No Images
+                                    @endif
                                 @else
                                     No Images
                                 @endif
@@ -76,8 +79,7 @@
                             <td>
                                 <a href="{{ route('defects.show', $defect) }}" class="btn btn-info btn-sm">View</a>
                                 <a href="{{ route('defects.edit', $defect) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <form action="{{ route('defects.destroy', $defect) }}" method="POST"
-                                    style="display:inline;">
+                                <form action="{{ route('defects.destroy', $defect) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>

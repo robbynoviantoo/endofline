@@ -14,13 +14,14 @@ class Defect extends Model
 
     // Tentukan kolom yang dapat diisi massal
     protected $fillable = [
-        'tanggal',
-        'cell',
-        'idpass',
-        'qtyok',
-        'qtynok',
-        'defect',
-        'images', 
+        'tanggal', 'cell', 'idpass', 'qtyok', 'qtynok', 'defect', 'images'
+    ];
+
+    protected $casts = [
+        'idpass' => 'array',
+        'qtyok' => 'array',
+        'qtynok' => 'array',
+        'images' => 'array',
     ];
 
     // Jika menggunakan timestamps, secara default Laravel akan mengelola kolom created_at dan updated_at
