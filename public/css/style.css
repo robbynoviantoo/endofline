@@ -1,44 +1,50 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
+    background-color: #F5F7F9;
 }
+
 .container {
     margin-top: 20px;
     left: 0;
     position: static;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     background-color: white;
     padding: 20px;
-    max-width: 90%; /* Tambahkan batas maksimum untuk responsif */
+    max-width: 90%;
+    /* Tambahkan batas maksimum untuk responsif */
 }
+
 h1 {
     color: black;
     font-size: 40px;
     font-weight: bold;
 }
 
-.subjudul{
+.subjudul {
     display: flex;
     justify-content: flex-start;
-    background-color: #f3f3f3;
+    background-color: white;
     padding: 25px;
     margin-top: 20px;
     align-items: center;
     border-radius: 0px 20px 20px 0px;
     width: 50%;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;/* Ubah lebar menjadi 100% untuk responsif */
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
-.content{
+.content {
     border-radius: 20px;
     padding: 30px;
-    background-color: #f3f3f3;/* Ubah lebar menjadi 100% untuk responsif */
-    width:500px; /* Tambahkan batas maksimum */
-    margin-top:120px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    background-color: white;
+    /* Ubah lebar menjadi 100% untuk responsif */
+    width: 500px;
+    /* Tambahkan batas maksimum */
+    margin-top: 120px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
-.bagi2{
+.bagi2 {
     display: flex;
     justify-content: space-around;
 }
@@ -46,74 +52,91 @@ h1 {
 .kanan {
     margin-top: 30px;
     padding-top: 30px;
-    background-color: #f3f3f3;
-    width: 100%; /* Ubah lebar menjadi 100% untuk responsif */
-    max-width: 1200px; /* Tambahkan batas maksimum */
+    background-color: white;
+    width: 100%;
+    /* Ubah lebar menjadi 100% untuk responsif */
+    max-width: 1200px;
+    /* Tambahkan batas maksimum */
     height: 80vh;
     border-radius: 20px;
-    overflow-y: scroll; /* Tetap bisa scroll */
-    scrollbar-width: none; /* Untuk Firefox */
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    overflow-y: scroll;
+    /* Tetap bisa scroll */
+    scrollbar-width: none;
+    /* Untuk Firefox */
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
 .kanan::-webkit-scrollbar {
-    display: none; /* Sembunyikan scrollbar untuk Chrome, Safari, dan Edge */
+    display: none;
+    /* Sembunyikan scrollbar untuk Chrome, Safari, dan Edge */
 }
 
-.defect-description{
+.defect-description {
     font-size: 20px;
     font-weight: 600;
     margin-top: 5px;
-text-align: center;
+    text-align: center;
 }
 
-h3{
+h3 {
     margin-top: 5px;
 }
 
 .table td {
-    font-size: 24px; /* Atur ukuran font untuk elemen td */
+    font-size: 24px;
+    /* Atur ukuran font untuk elemen td */
 }
 
 .defect-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center; /* Menyelaraskan konten ke tengah */
+    justify-content: center;
+    /* Menyelaraskan konten ke tengah */
 }
+
 .defect-item {
-    width: 250px; /* Atur lebar item gambar */
-    margin: 10px; /* Tambahkan margin untuk memberikan jarak antar item */
+    width: 250px;
+    /* Atur lebar item gambar */
+    margin: 10px;
+    /* Tambahkan margin untuk memberikan jarak antar item */
     text-align: center;
 }
+
 .defect-image {
-width: 250px; /* Atur lebar gambar menjadi 300px */
-height: 250px; /* Atur tinggi gambar menjadi 300px */
-object-fit: cover; /* Memotong gambar agar sesuai ukuran */
+    width: 250px;
+    /* Atur lebar gambar menjadi 300px */
+    height: 250px;
+    /* Atur tinggi gambar menjadi 300px */
+    object-fit: cover;
+    /* Memotong gambar agar sesuai ukuran */
 }
-h1 .judul{
+
+h1 .judul {
     padding-left: 20px;
 }
 
 .bagi2 {
     height: calc(100vh - 100px);
     overflow-y: auto;
-  }
+}
 
-  /* Media query untuk perangkat mobile */
+/* Media query untuk perangkat mobile */
 /* Menyelaraskan teks ke tengah */
 
 /* Media query untuk tampilan kecil */
 @media (max-width: 768px) {
-    
-    body{
-        margin: 5px ;
+
+    body {
+        margin: 5px;
     }
 
-    .subjudul{
+    .subjudul {
         width: 100%;
     }
+
     .bagi2 {
-        flex-direction: column; /* Ubah arah flex menjadi kolom */
+        flex-direction: column;
+        /* Ubah arah flex menjadi kolom */
     }
 
     h1 {
@@ -123,21 +146,28 @@ h1 .judul{
     }
 
     .table td {
-        font-size: 18px; /* Atur ukuran font untuk elemen td */
+        font-size: 18px;
+        /* Atur ukuran font untuk elemen td */
     }
 
     .kiri, .kanan {
-        width: 100%; /* Ubah lebar menjadi 100% untuk responsif */
-        margin-left: 0; /* Hapus margin kiri */
+        width: 100%;
+        /* Ubah lebar menjadi 100% untuk responsif */
+        margin-left: 0;
+        /* Hapus margin kiri */
     }
 
     .content {
-        margin-left: 0; /* Hapus margin kiri */
+        margin-left: 0;
+        /* Hapus margin kiri */
         margin-top: 20px;
         width: 100%;
-        max-width: 450px; /* Tambahkan margin atas untuk jarak */
+        max-width: 450px;
+        /* Tambahkan margin atas untuk jarak */
     }
+
     .bagi2 {
-        height: auto; /* Nonaktifkan 100vh pada perangkat mobile */
-      }
+        height: auto;
+        /* Nonaktifkan 100vh pada perangkat mobile */
+    }
 }

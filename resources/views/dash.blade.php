@@ -118,16 +118,26 @@
             </div>
             <div class="kanan">
                 <h1 class="judul" style="margin-left: 70px;">Detail Defect</h1>
-                @if (!empty($images))
+                @if (!empty($defect->images))
                     <div class="defect-container">
-                        @foreach ($images as $index => $image)
-                            <div class="defect-item">
-                                <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image"
-                                    class="defect-image">
-                                <div class="defect-description">
-                                    {{ $defectDescriptions[$index] ?? 'Keterangan tidak tersedia' }}
-                                </div>
-                            </div>
+                        @php
+                            $images = is_string($defect->images) ? json_decode($defect->images, true) : $defect->images;
+                            $descriptions = is_string($defect->defect) ? json_decode($defect->defect, true) : $defect->defect;
+                        @endphp
+                        
+                        @foreach ($images as $index => $imageGroup)
+                            @if (is_array($imageGroup))
+                                @foreach ($imageGroup as $imageIndex => $image)
+                                    <div class="defect-item">
+                                        <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image" class="defect-image">
+                                        <div class="defect-description">
+                                            {{ $defectDescriptions[$index] ?? 'Keterangan tidak tersedia' }}
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div>Tidak ada gambar.</div>
+                            @endif
                         @endforeach
                     </div>
                 @else

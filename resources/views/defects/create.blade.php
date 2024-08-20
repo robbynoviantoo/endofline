@@ -32,19 +32,19 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="idpass">ID Pass:</label>
-                    <input type="text" name="idpass[]" class="form-control" placeholder="ID Pass" value="{{ old('idpass.0') }}" required>
+                    <input type="text" name="idpass[]" class="form-control"  value="{{ old('idpass.0') }}" required>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="qtyok">Qty OK:</label>
-                    <input type="number" name="qtyok[]" class="form-control" placeholder="Qty OK" value="{{ old('qtyok.0') }}" required>
+                    <input type="number" name="qtyok[]" class="form-control"  value="{{ old('qtyok.0') }}" required>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="qtynok">Qty Not OK:</label>
-                    <input type="number" name="qtynok[]" class="form-control" placeholder="Qty Not OK" value="{{ old('qtynok.0') }}" required>
+                    <input type="number" name="qtynok[]" class="form-control"  value="{{ old('qtynok.0') }}" required>
                 </div>
             </div>
         </div>
@@ -52,11 +52,16 @@
 
         <!-- Defect -->
         <div id="defect-entries">
+            <div class="form-group">
+                <label for="defect">Defect:</label>
+            </div>
             @for ($i = 0; $i < 3; $i++)
                 <div class="defect-entry">
                     <div class="form-group">
-                        <label for="defect">Defect:</label>
-                        <input type="text" name="defect[]" class="form-control" placeholder="Defect" value="{{ old('defect.' . $i) }}">
+                        <input type="text" name="defect[]" class="form-control" value="{{ old('defect.' . $i) }}">
+                    </div>
+                    <div class="form-group">
+                        <input type="file" name="images[{{ $i }}][]" class="form-control" multiple>
                     </div>
                 </div>
             @endfor
@@ -65,11 +70,9 @@
 
         <!-- Input gambar -->
         <div class="form-group">
-            <label for="images">Gambar:</label>
-            <input type="file" id="images" name="images[]" class="form-control" multiple>
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Simpan</button>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Simpan</button>
     </form>
 </div>
 
@@ -123,12 +126,16 @@ function addIdPassEntry() {
 function addDefectEntry() {
     var container = document.getElementById('defect-entries');
 
+    var index = container.children.length / 2; // Calculate the next index based on current number of defect entries
+
     var newDefectEntry = document.createElement('div');
     newDefectEntry.className = 'defect-entry';
     newDefectEntry.innerHTML = `
         <div class="form-group">
-            <label for="defect">Defect:</label>
-            <input type="text" name="defect[]" class="form-control" placeholder="Defect">
+            <input type="text" name="defect[]" class="form-control">
+        </div>
+        <div class="form-group">
+            <input type="file" name="images[{{ $i }}][]" class="form-control" multiple>
         </div>
     `;
     container.appendChild(newDefectEntry);
@@ -146,6 +153,13 @@ function addDefectEntry() {
     }
 
     .col-md-4 {
+        margin-bottom: 1rem;
+    }
+    .defect-entry {
+        margin-bottom: 1rem;
+    }
+
+    .form-group {
         margin-bottom: 1rem;
     }
 

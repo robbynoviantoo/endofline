@@ -62,17 +62,27 @@
                             <td>
                                 @if (!empty($defect->images))
                                     @php
+                                        // Decode JSON jika perlu
                                         $images = is_string($defect->images) ? json_decode($defect->images, true) : $defect->images;
                                     @endphp
                                     @if (is_array($images))
-                                        @foreach ($images as $image)
-                                            <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image"
-                                                style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+                                        @foreach ($images as $imageGroup)
+                                            @if (is_array($imageGroup))  <!-- Menangani array dalam array -->
+                                                @foreach ($imageGroup as $image)
+                                                    <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image"
+                                                        style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+                                                @endforeach
+                                            @else
+                                                <!-- Jika tidak ada gambar -->
+                                                No Images
+                                            @endif
                                         @endforeach
                                     @else
+                                        <!-- Jika tidak ada gambar -->
                                         No Images
                                     @endif
                                 @else
+                                    <!-- Jika tidak ada gambar -->
                                     No Images
                                 @endif
                             </td>

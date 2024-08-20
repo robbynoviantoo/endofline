@@ -57,21 +57,28 @@
             <input type="file" id="images" name="images[]" class="form-control" multiple>
             @if($defect->images)
                 @php
+                    // Decode images JSON string into an array
                     $images = is_string($defect->images) ? json_decode($defect->images, true) : [];
                 @endphp
                 <div class="mt-2">
-                    @foreach($images as $index => $image)
-                        <div class="d-inline-block position-relative">
-                            <img src="{{ asset('storage/' . $image) }}" alt="Defect Image" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="removeImage('{{ route('defects.removeImage', ['defect' => $defect->id, 'image' => basename($image)]) }}')">Hapus</button>
-                            <input type="hidden" name="remove_images[]" value="{{ basename($image) }}">
-                        </div>
+                    @foreach($images as $index => $imageGroup)
+                        @if(is_array($imageGroup))  <!-- Check if imageGroup is an array -->
+                            @foreach($imageGroup as $image)
+                                <div class="d-inline-block position-relative">
+                                    <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image"
+                                         style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+                                    <button type="button" class="btn btn-danger btn-sm mt-1"
+                                            onclick="removeImage('{{ route('defects.removeImage', ['defect' => $defect->id, 'image' => basename($image)]) }}')">Hapus</button>
+                                    <input type="hidden" name="remove_images[]" value="{{ basename($image) }}">
+                                </div>
+                            @endforeach
+                        @endif
                     @endforeach
                 </div>
             @endif
         </div>
 
-        <button type="submit" class="btn btn-primary">Update</button>
+        <button type="submit" class="btn btn-primary mt-3">Update</button>
     </form>
 </div>
 
