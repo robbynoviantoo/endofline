@@ -125,52 +125,56 @@ class DefectController extends Controller
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'string',
         ]);
-
+    
         // Memperbarui data di database
         $defect->update([
             'tanggal' => $validated['tanggal'],
             'cell' => $validated['cell'],
-            'idpass' => json_encode($validated['idpass']),
-            'qtyok' => json_encode($validated['qtyok']),
-            'qtynok' => json_encode($validated['qtynok']),
+            'idpass' => isset($validated['idpass']) ? json_encode($validated['idpass']) : null,
+            'qtyok' => isset($validated['qtyok']) ? json_encode($validated['qtyok']) : null,
+            'qtynok' => isset($validated['qtynok']) ? json_encode($validated['qtynok']) : null,
             'defect' => isset($validated['defect']) ? json_encode($validated['defect']) : null,
         ]);
-
+    
         // Menghapus gambar yang dipilih
         if ($request->has('remove_images')) {
             $imagesToRemove = $request->input('remove_images');
             $existingImages = is_string($defect->images) ? json_decode($defect->images, true) : [];
-
+    
             foreach ($imagesToRemove as $imageToRemove) {
                 $imageToRemovePath = 'images/' . $imageToRemove;
                 if (($key = array_search($imageToRemovePath, $existingImages)) !== false) {
                     unset($existingImages[$key]);
                     // Hapus gambar dari penyimpanan publik
-                    Storage::disk('public')->delete($imageToRemovePath);
+                    if (Storage::disk('public')->exists($imageToRemovePath)) {
+                        Storage::disk('public')->delete($imageToRemovePath);
+                    }
                 }
             }
-
-            // Update daftar gambar di database
+    
+            // Perbarui daftar gambar di database
             $defect->images = json_encode(array_values($existingImages));
             $defect->save();
         }
-
+    
         // Menyimpan gambar baru jika ada
         if ($request->hasFile('images')) {
             $imagePaths = is_string($defect->images) ? json_decode($defect->images, true) : [];
             foreach ($request->file('images', []) as $index => $images) {
                 foreach ($images as $image) {
                     $path = $image->store('images', 'public');
+                    if (!isset($imagePaths[$index])) {
+                        $imagePaths[$index] = [];
+                    }
                     $imagePaths[$index][] = $path;
                 }
             }
             $defect->images = json_encode($imagePaths);
             $defect->save();
         }
-
-        return redirect()->route('defects.index')->with('success', 'Defect updated successfully!');
+    
+        return redirect()->route('defects.index')->with('success', 'Defect berhasil diperbarui!');
     }
-
     // Menghapus gambar dari defect
     public function removeImage(Request $request, $defectId, $image)
     {

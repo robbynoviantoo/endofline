@@ -88,7 +88,7 @@
                             </td>
                             <td>
                                 <a href="{{ route('defects.show', $defect) }}" class="btn btn-info btn-sm">View</a>
-                                <a href="{{ route('defects.edit', $defect) }}" class="btn btn-warning btn-sm">Edit</a>
+                                {{-- <a href="{{ route('defects.edit', $defect) }}" class="btn btn-warning btn-sm">Edit</a> --}}
                                 <form action="{{ route('defects.destroy', $defect) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')

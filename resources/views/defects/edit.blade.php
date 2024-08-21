@@ -67,8 +67,8 @@
                                 <div class="d-inline-block position-relative">
                                     <img src="{{ asset('storage/app/public/' . $image) }}" alt="Defect Image"
                                          style="max-width: 100px; max-height: 100px; margin-right: 10px;">
-                                    <button type="button" class="btn btn-danger btn-sm mt-1"
-                                            onclick="removeImage('{{ route('defects.removeImage', ['defect' => $defect->id, 'image' => basename($image)]) }}')">Hapus</button>
+                                         <button type="button" class="btn btn-danger btn-sm mt-1"
+                                         onclick="removeImage('{{ route('defects.removeImage', ['defect' => $defect->id, 'image' => basename($image)]) }}', this.parentElement)">Hapus</button>
                                     <input type="hidden" name="remove_images[]" value="{{ basename($image) }}">
                                 </div>
                             @endforeach
@@ -110,19 +110,24 @@ function addQtyNokField() {
     container.appendChild(input);
 }
 
-function removeImage(url) {
+function removeImage(url, imageElement) {
     if (confirm('Apakah Anda yakin ingin menghapus gambar ini?')) {
         fetch(url, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Jaringan tidak responsif');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                location.reload(); // Refresh halaman setelah penghapusan berhasil
+                // Hapus elemen gambar dari DOM jika penghapusan berhasil
+                imageElement.remove();
             } else {
                 throw new Error('Gagal menghapus gambar.');
             }
@@ -133,5 +138,6 @@ function removeImage(url) {
         });
     }
 }
+
 </script>
 @endsection
